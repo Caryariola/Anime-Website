@@ -32,6 +32,6 @@ export default function AnimeGrid(props: any) {
 
                       
                 </div>
-                {pagi &&  (<Pagination items={items} page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)}
+                {/* {pagi &&  (<Pagination items={items} page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)} */}
         </>
     )};
