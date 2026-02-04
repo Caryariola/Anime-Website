@@ -51,7 +51,7 @@ export default function Search() {
     
     return ( 
         <>
-        <div className="flex flex-col gap-4 min-h-screen  max-w-screen items-center font-sans " >
+        <div className="flex flex-col gap-4 min-h-screen  max-w-screen items-center font-sans mt-15" >
             <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-[100px] -z-10"></div>
             <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600/10 rounded-full blur-[100px] -z-10"></div>
             <div className="flex flex-col z-10 gap-2 max-w-270 w-full min-h-screen ">
