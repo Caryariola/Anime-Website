@@ -19,9 +19,11 @@ export default function Card(props : any){
                 </div> 
                 <div className="p-2">
                     <p className="text-xs font-bold text-left h-8 line-clamp-2 overflow-hidden mb-1">{props.title}</p>
-                    <p className="text-xs text-gray-500 text-left">{props.type}</p>
-                    <p className="text-xs text-gray-500 text-left">EP: {props.episodes}</p>
-                    <p className="text-xs text-gray-500 text-left">Score: {props.score}</p>
+                    <div className='flex gap-3'>
+                        <p className="text-xs text-gray-500 text-left">{props.type} |</p>
+                        <p className="text-xs text-gray-500 text-left">EP: {props.episodes}</p>
+                        <p className="text-xs text-gray-500 text-left ml-auto">Score: {props.score}</p>
+                    </div>
                 </div>
             </div>
         </div>    

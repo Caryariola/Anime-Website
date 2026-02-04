@@ -7,6 +7,7 @@ export interface AnimeData {
   episodes: number | string;
   mal_id: number;
   popularity: number;
+  genre: string[];
 }
 
 export const dynamicTitle = (query: string) => {
@@ -40,6 +41,7 @@ export async function fetchTopPopular(): Promise<AnimeData[]> {
     score: anime.score || 'N/A',
     episodes: anime.episodes || 'N/A',
     mal_id: anime.mal_id,
+    genre: anime.genres ? anime.genres.map((g: any) => g.name) : []
   }));
 }
 
@@ -73,7 +75,8 @@ export async function fetchData(query: string="",page: number=1):Promise<{topAni
       score: anime.score || 'N/A',
       episodes: anime.episodes || 'N/A',
       mal_id: anime.mal_id,
-      popularity: anime.popularity || 9999
+      popularity: anime.popularity || 9999,
+      genre: anime.genres ? anime.genres.map((g: any) => g.name) : []
     }));
 
    

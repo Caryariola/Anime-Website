@@ -4,8 +4,9 @@ import Pagination from "@/app/components/pagination";
 
 
 export default function AnimeGrid(props: any) {
-  const lmt = props.search && props.search.length > 0 ? props.items :  5;
-  const pagi = lmt === 25;
+  const items = props.items;
+  const lmt = props.search && props.search.length > 0 ? items :  5;
+  const pagi = lmt >= 25 || items > 1;
     
   
 
@@ -15,7 +16,7 @@ export default function AnimeGrid(props: any) {
                 <h1 className="text-3xl font-medium p-2">{props.title}</h1>
               </div>
         
-                <div className="w-full max-w-7xl  mx-auto rounded-2xl p-3 border bg-black/10">
+                <div className="w-full max-w-7xl  mx-auto rounded-2xl p-3  bg-black/10">
                   {props.isLoading ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {[...Array(lmt)].map((_, index) => (
@@ -31,6 +32,6 @@ export default function AnimeGrid(props: any) {
 
                       
                 </div>
-                {pagi && (<Pagination page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)}
+                {pagi &&  (<Pagination items={items} page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)}
         </>
     )};

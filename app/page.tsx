@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AnimeData, dynamicTitle, fetchData, fetchTopPopular } from "@/lib/animeServices";
 import { getAnilistBanner, PageProps } from "@/lib/anilistServices";
 import SearchBar from "./components/searchbar";
@@ -16,6 +17,18 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [anilistBanner, setAnilistBanner] = useState<string | null>(null);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const query = searchParams.get("q") || "";
+
+    if (query !== searchText) {
+        setSearchText(query);
+        setPage(1); // Always reset to page 1 on new search/reset
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -33,7 +46,7 @@ export default function Home() {
         // 2. Fetch Popular only if we don't have it and aren't searching
         if (alltimepopularanime.length === 0 && searchText === "") {
           // A tiny pause (200ms) prevents the API from getting grumpy
-          await new Promise(res => setTimeout(res, 200));
+          await new Promise(res => setTimeout(res, 400));
           const popular = await fetchTopPopular();
           setAlltimepopularanime(popular);
         }
@@ -58,12 +71,11 @@ export default function Home() {
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
     
-    setIsLoading(true);
-    setPage(1);
-    const result = await fetchData(searchText, 1);
-    setAnimeData(result.topAnime);
-    setHeaderTitle(result.title);
-    setIsLoading(false);
+    if (searchText.trim()) {
+        router.push(`/?q=${encodeURIComponent(searchText)}`);
+    } else {
+        router.push('/');
+    }
   
   };
 
@@ -83,8 +95,11 @@ export default function Home() {
           <SearchBar searchText={searchText} setSearchText={setSearchText} handleSearch={handleSearch} />
         </div>
 
-        <AnimeGrid animedata={animeData} isLoading={isLoading} title={dynamicTitle(searchText)} search={searchText} page={page} prevonclick={handlePrev} nextonclick={handleNext} items={animeData.length}/>
-        {searchText.length === 0 && <><AnimeGrid animedata={alltimepopularanime} search={searchText} isLoading={isLoading} title="All Time Popular Anime"/></>}
+        
+        {searchText.length === 0 ? <>
+        <AnimeGrid animedata={animeData} isLoading={isLoading} title={dynamicTitle(searchText)} search={searchText}/>
+        <AnimeGrid animedata={alltimepopularanime} search={searchText} isLoading={isLoading} title="All Time Popular Anime"/>
+        </> : <AnimeGrid animedata={animeData} isLoading={isLoading} title={dynamicTitle(searchText)} search={searchText} page={page} prevonclick={handlePrev} nextonclick={handleNext} items={animeData.length}/>}
       </div>  
     </div></>
   );
