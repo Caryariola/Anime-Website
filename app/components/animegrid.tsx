@@ -1,12 +1,16 @@
 import LoadingCard from "./laodingcard"
 import CardBox from "./card"
-import Pagination from "@/app/components/pagination";
+
 
 
 export default function AnimeGrid(props: any) {
   const items = props.items;
-  const lmt = props.search && props.search.length > 0 ? 25 :  5;
-  const pagi = lmt >= 25 || items > 1;
+  let lmt = 0;
+  if(props.search){
+     lmt =  25;
+  } else{
+     lmt =   5;
+  }
     
   
 
@@ -32,6 +36,6 @@ export default function AnimeGrid(props: any) {
 
                       
                 </div>
-                {/* {pagi &&  (<Pagination items={items} page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)} */}
+                
         </>
     )};

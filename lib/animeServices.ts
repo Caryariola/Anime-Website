@@ -24,11 +24,15 @@ function tranformData(rawData: any[]): AnimeData[]{
   }));
 }
 
-export const dynamicTitle = (query: string) => {
+export const searchdynamicTitle = (query: string) => {
   if (query.length > 0) {
     return `Search results for "${query}"`;
   }
 
+  return "Trending Now";
+}
+
+export const seasondynamicTitle = (query: string) => {
   const now = new Date();
   const month = now.getMonth();
   const year = now.getFullYear();
@@ -57,34 +61,27 @@ export async function fetchPopularThisSeason():Promise<{PTS: AnimeData[], Title:
 
   let rawData = json.data || [];
 
-    return {PTS: tranformData(rawData) , Title: dynamicTitle("") };
+    return {PTS: tranformData(rawData) , Title: seasondynamicTitle("") };
 }
 
-export async function fetchSearchAnime(query: any):Promise<AnimeData[]> {
-  const apiLink = query 
+export async function fetchSearchAnime(query: any):Promise<{Anidata: AnimeData[], title: string}> {
+  const apiLink = query.length > 0 
     ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=25`
-    : `https://api.jikan.moe/v4/top/anime`;
+    : `https://api.jikan.moe/v4/top/anime?filter=airing`;
   const response = await fetch(apiLink);
   const json = await response.json();
-
-   
 
   let rawData = json.data || [];
 
   if (query && query.trim().length > 0) {
-    
-    // Split search query into clean words: "  Black   Clover  " -> ["black", "clover"]
     const searchTerms = query.toLowerCase().trim().split(/\s+/);
 
     rawData = rawData.filter((anime: any) => {
-      // Combine English and Standard titles to check both
       const combinedTitle = (
         (anime.title || "") + " " + 
         (anime.title_english || "")
       ).toLowerCase();
 
-      // THE RULE: Every single word in the search query MUST exist in the title
-      // "Black" exists? AND "Clover" exists?
       return searchTerms.every((term : any) => combinedTitle.includes(term));
     });
   }
@@ -92,7 +89,7 @@ export async function fetchSearchAnime(query: any):Promise<AnimeData[]> {
   // 3. Slice back down to 10 items (since we fetched 25 to be safe)
   const finalData = rawData.slice(0, 25);
 
-  return tranformData(finalData);
+  return {Anidata: tranformData(finalData), title: searchdynamicTitle(query)}
 }
 
  

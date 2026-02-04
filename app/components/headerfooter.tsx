@@ -12,6 +12,7 @@ export default function Header(props : any) {
                     </span>
                 </div>
                 <nav className="flex ml-4 items-center gap-2 md:gap-5  md:ml-20">
+                    <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/">Home</Link>
                     <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/Search">Search</Link>
                     <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/about">About</Link>
                     <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2 text-white rounded hover:bg-white hover:text-black transition-colors" href="/contact">Contact</Link>

@@ -3,79 +3,65 @@
 import SearchBar from "../components/searchbar";
 import AnimeGrid from "../components/animegrid";
 import { AnimeData, fetchSearchAnime } from "@/lib/animeServices";
-import { useState,useEffect,Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState,useEffect } from "react";
 
-export default function SearchPage() {
-    return (
-        // This 'Suspense' tag fixes the error!
-        // It shows "Loading..." for a split second while reading the URL.
-        <Suspense fallback={<div className="text-white text-center p-10">Loading Search...</div>}>
-            <SearchContent />
-        </Suspense>
-    );
-}
 
-function SearchContent() {
+
+
+export default function Search() {
     const [searchText, setSearchText] = useState("");
-    const [results, setResults] = useState<AnimeData[]>([]);
+    const [Animedata, setAnimeData] = useState<AnimeData[]>([]);
+    const [HeaderTitle, setHeaderTitle] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const router = useRouter();
-    const searchParams = useSearchParams();
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
 
-    // --- 2. THE FETCH LOGIC ---
-    const executeSearch = async (query: string) => {
+            try{
+                const data = await fetchSearchAnime(searchText);
+                setAnimeData(data.Anidata);
+                setHeaderTitle(data.title);
+            } catch(error){
+                console.error("Failed to load anime:", error);
+             } finally {
+                 setIsLoading(false);
+             }
+        }    
+
+        loadData();
+        
+    },[]);
+
+    const handleSearch = async (event: React.FormEvent) => {
+        event.preventDefault();
+    
         setIsLoading(true);
         try {
-            // If query is empty, fetch top anime, otherwise search
-            const data = await fetchSearchAnime(query);
-            setResults(data);
+            const result = await fetchSearchAnime(searchText);
+            setAnimeData(result.Anidata);
+            setHeaderTitle(result.title);
         } catch (error) {
-            console.error(error);
+            console.error("Search failed:", error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // --- 3. THE "BRAIN" (useEffect) ---
-    // This runs automatically when the page loads OR when the URL changes.
-    useEffect(() => {
-        // Get the query from the URL (e.g., ?q=Naruto)
-        const query = searchParams.get("q") || ""; 
-        
-        // Update the input box to match the URL
-        setSearchText(query);
-        
-        // Actually fetch the data
-        executeSearch(query);
-
-    }, [searchParams]); // <--- This dependency makes it run on URL updates
-
-    // --- 4. THE USER ACTION ---
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault(); // Stop page reload
-
-        // We DO NOT fetch data here. 
-        // We only update the URL. The useEffect above will notice and do the work.
-        if (searchText.trim()) {
-            router.push(`/Search?q=${encodeURIComponent(searchText)}`);
-        } else {
-            router.push(`/Search`);
-        }
-    };
-
+    
     return ( 
         <>
         <div className="flex flex-col gap-4 min-h-screen  max-w-screen items-center font-sans " >
+            <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-violet-600/20 rounded-full blur-[100px] -z-10"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600/10 rounded-full blur-[100px] -z-10"></div>
             <div className="flex flex-col z-10 gap-2 max-w-270 w-full min-h-screen ">
-                <div className="flex flex-wrap justify-start rounded-2xl gap-2 p-3 ">
+                <div className="flex flex-wrap justify-start rounded-2xl gap-2 p-3">
                     <SearchBar searchText={searchText} setSearchText={setSearchText} handleSearch={handleSearch} />
                     
                 </div>
 
                 <div className="flex flex-col z-10 gap-2 max-w-270 w-full min-h-screen "> 
-                        <AnimeGrid   isLoading={isLoading} animedata={results} search={"search"}/>
+                        <AnimeGrid   isLoading={isLoading} animedata={Animedata} search={true} title={HeaderTitle}/>
                       </div> 
 
 

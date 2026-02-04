@@ -1,20 +1,36 @@
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
+
 export default function SearchBar(props : any) {
     return(
         <>
-        <form onSubmit={props.handleSearch} className="flex items-center">
-                    <input
-                      type="text"
-                      value={props.searchText} onChange={(e) => props.setSearchText(e.target.value)}
-                      placeholder="Search for an anime..."
-                      className="border  border-gray-300 rounded-4xl px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                    {/* <button
-                      type="submit"
-                      className="bg-blue-500 text-white px-3 py-1.5 rounded-r text-sm hover:bg-blue-600 transition duration-200"
-                    >
-                      Search
-                    </button> */}
-                  </form>
+        <form onSubmit={props.handleSearch} className="flex gap-2 items-center">
+      
+      
+      <IconField iconPosition="left">
+        <InputIcon className="pi pi-search" />
+        <InputText 
+          value={props.searchText} 
+          onChange={(e) => props.setSearchText(e.target.value)}
+          placeholder="Search for an anime..."
+          className="p-inputtext-sm w-64 rounded-full" 
+         
+        />
+      </IconField>
+
+     
+      <Button 
+        label="Search" 
+        type="submit" 
+        icon="pi pi-arrow-right" 
+        iconPos="right"
+        loading={props.isLoading} 
+        className="p-button-sm p-button-rounded"
+      />
+      
+    </form>
         </>
     )
 }
