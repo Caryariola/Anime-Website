@@ -1,10 +1,11 @@
 import LoadingCard from "./laodingcard"
 import CardBox from "./card"
-
+import Pagination from "@/app/components/pagination";
 
 
 export default function AnimeGrid(props: any) {
-  const lmt = props.search && props.search.length > 0 ? 25 :  5;
+  const lmt = props.search && props.search.length > 0 ? props.items :  5;
+  const pagi = lmt === 25;
     
   
 
@@ -24,8 +25,12 @@ export default function AnimeGrid(props: any) {
                   ) : (<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {props.animedata.slice(0, lmt).map((anime: any, index: number) => (
                     <CardBox image={anime.image} title={anime.title}  type={anime.type} key={`${anime.mal_id}-${index}`} episodes={anime.episodes} score={anime.score} malId={anime.mal_id} />
+                    
                   ))}
-                  </div>)}    
+                  </div>)}
+
+                      
                 </div>
+                {pagi && (<Pagination page={props.page} prevonclick={props.prevonclick} nextonclick={props.nextonclick}/>)}
         </>
     )};
