@@ -4,9 +4,7 @@ import SearchBar from "../components/searchbar";
 import AnimeGrid from "../components/animegrid";
 import { AnimeData, fetchSearchAnime } from "@/lib/animeServices";
 import { useState,useEffect } from "react";
-
-
-
+import { Paginator } from 'primereact/paginator';
 
 export default function Search() {
     const [searchText, setSearchText] = useState("");
@@ -14,41 +12,47 @@ export default function Search() {
     const [HeaderTitle, setHeaderTitle] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        const loadData = async () => {
+    const [page, setPage] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0); 
+    const [first, setFirst] = useState(0);
+
+    const loadData = async (query: string, pageNumber: number) => {
             setIsLoading(true);
 
             try{
-                const data = await fetchSearchAnime(searchText);
+                const data = await fetchSearchAnime(query, pageNumber);
                 setAnimeData(data.Anidata);
                 setHeaderTitle(data.title);
+
+                setTotalRecords(data.pagination?.items?.total || 0);
             } catch(error){
                 console.error("Failed to load anime:", error);
              } finally {
                  setIsLoading(false);
              }
-        }    
+        }   
 
-        loadData();
-        
+    useEffect(() => { 
+        loadData(searchText, 1);
+
     },[]);
 
     const handleSearch = async (event: React.FormEvent) => {
         event.preventDefault();
-    
-        setIsLoading(true);
-        try {
-            const result = await fetchSearchAnime(searchText);
-            setAnimeData(result.Anidata);
-            setHeaderTitle(result.title);
-        } catch (error) {
-            console.error("Search failed:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        setPage(1);
+        setFirst(0);
+
+        await loadData(searchText, 1);
     };
 
-    
+    const onPageChange = (event: any) => {
+        setFirst(event.first);
+        const newPage = event.page + 1; 
+        setPage(newPage);
+        loadData(searchText, newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return ( 
         <>
         <div className="flex flex-col gap-4 min-h-screen  max-w-screen items-center font-sans mt-15" >
@@ -62,7 +66,20 @@ export default function Search() {
 
                 <div className="flex flex-col z-10 gap-2 max-w-270 w-full min-h-screen "> 
                         <AnimeGrid   isLoading={isLoading} animedata={Animedata} search={true} title={HeaderTitle}/>
-                      </div> 
+
+                        {!isLoading && totalRecords > 0 && (
+                        <div className="w-full bg-white/5 backdrop-blur-md max-w-270 rounded-xl border border-white/10 p-2">
+                            <Paginator 
+                                first={first} 
+                                rows={25} 
+                                totalRecords={totalRecords} 
+                                onPageChange={onPageChange}
+                                className="bg-transparent!" 
+                                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                            />
+                        </div>
+                    )}
+                </div> 
 
 
             </div>
@@ -70,22 +87,3 @@ export default function Search() {
         </>
     )
 }
-
-//  const handleSearch = async (event: React.FormEvent) => {
-//     event.preventDefault();
-    
-//     if (searchText.trim()) {
-//         router.push(`/?q=${encodeURIComponent(searchText)}`);
-//     } else {
-//         router.push('/');
-//     }
-  
-//   };
-
-//   const handleNext = () => setPage(prev => prev + 1);
-//   const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
-
-
-
-
-

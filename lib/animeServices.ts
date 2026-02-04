@@ -64,10 +64,10 @@ export async function fetchPopularThisSeason():Promise<{PTS: AnimeData[], Title:
     return {PTS: tranformData(rawData) , Title: seasondynamicTitle("") };
 }
 
-export async function fetchSearchAnime(query: any):Promise<{Anidata: AnimeData[], title: string}> {
+export async function fetchSearchAnime(query: string, page: number = 1):Promise<{Anidata: AnimeData[], title: string, pagination: any}> {
   const apiLink = query.length > 0 
-    ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=25`
-    : `https://api.jikan.moe/v4/top/anime?filter=airing`;
+    ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${page}&limit=25`
+    : `https://api.jikan.moe/v4/top/anime?filter=airing&page=${page}&limit=25`;
   const response = await fetch(apiLink);
   const json = await response.json();
 
@@ -75,21 +75,15 @@ export async function fetchSearchAnime(query: any):Promise<{Anidata: AnimeData[]
 
   if (query && query.trim().length > 0) {
     const searchTerms = query.toLowerCase().trim().split(/\s+/);
-
     rawData = rawData.filter((anime: any) => {
-      const combinedTitle = (
-        (anime.title || "") + " " + 
-        (anime.title_english || "")
-      ).toLowerCase();
-
+      const combinedTitle = ((anime.title || "") + " " + (anime.title_english || "")).toLowerCase();
       return searchTerms.every((term : any) => combinedTitle.includes(term));
     });
   }
 
-  // 3. Slice back down to 10 items (since we fetched 25 to be safe)
   const finalData = rawData.slice(0, 25);
 
-  return {Anidata: tranformData(finalData), title: searchdynamicTitle(query)}
+  return {Anidata: tranformData(finalData), title: searchdynamicTitle(query),  pagination: json.pagination}
 }
 
  
