@@ -6,7 +6,7 @@ export default function About() {
       </div>
 
       <div className=" border text-sm font-light p-2">
-       about the page like descritiopn chuchu!
+       AnimeHub is a simple 
       </div>
     </div>
   )
