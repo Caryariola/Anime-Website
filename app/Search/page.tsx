@@ -3,11 +3,20 @@
 import SearchBar from "../components/searchbar";
 import AnimeGrid from "../components/animegrid";
 import { AnimeData, fetchSearchAnime } from "@/lib/animeServices";
-import { useState,useEffect,useRef } from "react";
+import { useState,useEffect,Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+export default function SearchPage() {
+    return (
+        // This 'Suspense' tag fixes the error!
+        // It shows "Loading..." for a split second while reading the URL.
+        <Suspense fallback={<div className="text-white text-center p-10">Loading Search...</div>}>
+            <SearchContent />
+        </Suspense>
+    );
+}
 
-export default function Search() {
+function SearchContent() {
     const [searchText, setSearchText] = useState("");
     const [results, setResults] = useState<AnimeData[]>([]);
     const [isLoading, setIsLoading] = useState(false);
