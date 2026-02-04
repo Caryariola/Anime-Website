@@ -10,6 +10,20 @@ export interface AnimeData {
   genre: string[];
 }
 
+function tranformData(rawData: any[]): AnimeData[]{
+  return rawData.map((anime: any) => ({
+    rank: anime.rank || 9999,
+    title: anime.title_english || anime.title,
+    image: anime.images.jpg.large_image_url || anime.images.jpg.image_url,
+    type: anime.type,
+    score: anime.score || 'N/A',
+    episodes: anime.episodes || 'N/A',
+    mal_id: anime.mal_id,
+    popularity: anime.popularity || 9999,
+    genre: anime.genres ? anime.genres.map((g: any) => g.name) : []
+  }));
+}
+
 export const dynamicTitle = (query: string) => {
   if (query.length > 0) {
     return `Search results for "${query}"`;
@@ -29,61 +43,56 @@ export const dynamicTitle = (query: string) => {
 }
 
 export async function fetchTopPopular(): Promise<AnimeData[]> {
-  const res = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10`);
-  const json = await res.json();
+  const response = await fetch(`https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=10`);
+  const json = await response.json();
   const rawData = json.data || [];
 
-  return rawData.map((anime: any) => ({
-    rank: anime.rank || 9999,
-    title: anime.title_english || anime.title,
-    image: anime.images.jpg.large_image_url,
-    type: anime.type,
-    score: anime.score || 'N/A',
-    episodes: anime.episodes || 'N/A',
-    mal_id: anime.mal_id,
-    genre: anime.genres ? anime.genres.map((g: any) => g.name) : []
-  }));
+  return tranformData(rawData);
 }
 
-export async function fetchData(query: string="",page: number=1):Promise<{topAnime: AnimeData[], title: string}> {
-  const apiLink = query.length > 0 ? `https://api.jikan.moe/v4/anime?q=${query}&page=${page}` : `https://api.jikan.moe/v4/seasons/now?page=${page}`;
+export async function fetchPopularThisSeason():Promise<{PTS: AnimeData[], Title: string}> {
+  const apiLink = `https://api.jikan.moe/v4/seasons/now?limit=10`;
   const response = await fetch(apiLink);
-  const data = await response.json();
+  const json = await response.json();
 
-  let rawData = data.data || [];
+  let rawData = json.data || [];
 
-  
+    return {PTS: tranformData(rawData) , Title: dynamicTitle("") };
+}
 
-  if (query.length > 0) {
-    // Break search into words: "Blue Box" -> ["blue", "box"]
-    const searchTerms = query.toLowerCase().split(" ");
-    rawData = rawData.filter((anime: any) => {
-      const standard = (anime.title || "").toLowerCase();
-      const english = (anime.title_english || "").toLowerCase();
-    // 2. GLUE them together (Concatenate)
-      const combinedText = standard + " " + english;
-    // 3. Search inside the combined text
-      return searchTerms.every((term) => combinedText.includes(term));
-    });
-  }
-
-    const topAnime: AnimeData[] = rawData.map((anime: any) => ({
-      rank: anime.rank || 9999,
-      title: anime.title_english || anime.title,
-      image: anime.images.jpg.image_url,
-      type: anime.type,
-      score: anime.score || 'N/A',
-      episodes: anime.episodes || 'N/A',
-      mal_id: anime.mal_id,
-      popularity: anime.popularity || 9999,
-      genre: anime.genres ? anime.genres.map((g: any) => g.name) : []
-    }));
+export async function fetchSearchAnime(query: any):Promise<AnimeData[]> {
+  const apiLink = query 
+    ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=25`
+    : `https://api.jikan.moe/v4/top/anime`;
+  const response = await fetch(apiLink);
+  const json = await response.json();
 
    
 
-    if (query.length > 0) {
-      return { topAnime: topAnime.sort((a, b) => a.rank - b.rank), title: dynamicTitle(query) };
-    }
+  let rawData = json.data || [];
 
-    return { topAnime: topAnime, title: dynamicTitle(query) };
+  if (query && query.trim().length > 0) {
+    
+    // Split search query into clean words: "  Black   Clover  " -> ["black", "clover"]
+    const searchTerms = query.toLowerCase().trim().split(/\s+/);
+
+    rawData = rawData.filter((anime: any) => {
+      // Combine English and Standard titles to check both
+      const combinedTitle = (
+        (anime.title || "") + " " + 
+        (anime.title_english || "")
+      ).toLowerCase();
+
+      // THE RULE: Every single word in the search query MUST exist in the title
+      // "Black" exists? AND "Clover" exists?
+      return searchTerms.every((term : any) => combinedTitle.includes(term));
+    });
+  }
+
+  // 3. Slice back down to 10 items (since we fetched 25 to be safe)
+  const finalData = rawData.slice(0, 25);
+
+  return tranformData(finalData);
 }
+
+ 

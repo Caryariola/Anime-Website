@@ -5,7 +5,7 @@ import Pagination from "@/app/components/pagination";
 
 export default function AnimeGrid(props: any) {
   const items = props.items;
-  const lmt = props.search && props.search.length > 0 ? items :  5;
+  const lmt = props.search && props.search.length > 0 ? 25 :  5;
   const pagi = lmt >= 25 || items > 1;
     
   

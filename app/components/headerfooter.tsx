@@ -12,7 +12,7 @@ export default function Header(props : any) {
                     </span>
                 </div>
                 <nav className="flex ml-4 items-center gap-2 md:gap-5  md:ml-20">
-                    <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/">Home</Link>
+                    <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/Search">Search</Link>
                     <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2  text-white rounded hover:bg-white hover:text-black transition-colors" href="/about">About</Link>
                     <Link className="whitespace-nowrap align-middle text-xs sm:text-base p-2 text-white rounded hover:bg-white hover:text-black transition-colors" href="/contact">Contact</Link>
                 </nav>
@@ -27,7 +27,7 @@ export default function Header(props : any) {
 
 export function Footer() {
     return (
-        <footer className="w-full mt-8 p-4 border-t text-center text-sm text-gray-500">
+        <footer className="w-full mt-20  p-10 border-t text-center text-sm text-gray-500">
             <p>© {new Date().getFullYear()} AnimeHub. All rights reserved.</p>
         </footer>
     );
